@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoStudio Kids - Pro Editor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fredoka:wght@600&display=swap');
+        
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a; /* Darker Slate */
+            color: #f8fafc;
+        }
+
+        .kids-font { font-family: 'Fredoka', sans-serif; }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: 72px 320px 1fr;
+            grid-template-rows: 56px 1fr 220px;
+            height: 100vh;
+        }
+
+        .header { grid-column: 1 / -1; }
+        .sidebar-nav { grid-column: 1 / 2; grid-row: 2 / -1; }
+        .asset-panel { grid-column: 2 / 3; grid-row: 2 / -1; }
+        .canvas-area { grid-column: 3 / 4; grid-row: 2 / 3; }
+        .timeline-area { grid-column: 3 / 4; grid-row: 3 / 4; }
+
+        .video-canvas {
+            aspect-ratio: 16 / 9;
+            width: 85%;
+            max-width: 900px;
+            background: #000;
+            border-radius: 16px;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .overlay-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.8);
+            font-weight: 700;
+            pointer-events: none;
+            z-index: 20;
+            text-align: center;
+        }
+
+        .active-tab {
+            background-color: #1e293b;
+            color: #38bdf8;
+            border-right: 3px solid #38bdf8;
+        }
+
+        .timeline-ruler {
+            background-image: repeating-linear-gradient(90deg, #334155 0px, #334155 1px, transparent 1px, transparent 40px);
+        }
+
+        .filter-sepia { filter: sepia(0.8); }
+        .filter-grayscale { filter: grayscale(1); }
+        .filter-bright { filter: brightness(1.3) contrast(1.1); }
+        .filter-none { filter: none; }
+
+        .scene-card.active {
+            border-color: #38bdf8;
+            background: #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-grid">
+        <!-- HEADER -->
+        <header class="header bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 z-40">
+            <div class="flex items-center gap-4">
+                <div class="bg-sky-500 text-white p-1.5 rounded-lg shadow-lg">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.934a.5.5 0 0 0-.777-.416L16 11"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-sm font-bold text-slate-100 leading-none">Magic Studio Pro</h1>
+                    <p class="text-[10px] text-sky-400 font-medium">Dark Mode Enabled</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="downloadCurrentScene()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-1.5 rounded-full text-xs font-semibold transition border border-slate-700">Download Clip</button>
+                <button class="bg-sky-500 hover:bg-sky-600 text-white px-5 py-1.5 rounded-full text-xs font-bold shadow-md transition">Export Movie</button>
+            </div>
+        </header>
+
+        <!-- SIDEBAR NAV -->
+        <nav class="sidebar-nav bg-slate-950 border-r border-slate-800 flex flex-col items-center py-6 gap-4">
+            <button id="btn-scenes" onclick="switchTab('scenes', event)" class="p-3 rounded-xl hover:bg-slate-800 text-slate-500 transition active-tab" title="Scenes">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/></svg>
+            </button>
+            <button id="btn-media" onclick="switchTab('media', event)" class="p-3 rounded-xl hover:bg-slate-800 text-slate-500 transition" title="Media">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+            </button>
+            <button id="btn-text" onclick="switchTab('text', event)" class="p-3 rounded-xl hover:bg-slate-800 text-slate-500 transition" title="Text">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+            </button>
+            <button id="btn-audio" onclick="switchTab('audio', event)" class="p-3 rounded-xl hover:bg-slate-800 text-slate-500 transition" title="Audio & Filters">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+            </button>
+        </nav>
+
+        <!-- ASSET PANEL -->
+        <aside class="asset-panel bg-slate-900 border-r border-slate-800 p-5 overflow-y-auto">
+            <!-- Scenes -->
+            <div id="tab-scenes" class="tab-content space-y-4">
+                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-widest">Your Scenes</h3>
+                <div id="scenes-container" class="space-y-3">
+                    <!-- Scenes rendered here -->
+                </div>
+                <button onclick="createNewScene()" class="w-full py-3 border-2 border-dashed border-slate-700 rounded-xl text-xs font-bold text-slate-500 hover:border-sky-500 hover:text-sky-400 transition">+ New Empty Scene</button>
+            </div>
+
+            <!-- Media -->
+            <div id="tab-media" class="tab-content hidden space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-slate-400 text-xs uppercase tracking-widest">Media</h3>
+                    <button onclick="startCamera()" class="text-[10px] bg-sky-500/10 text-sky-400 px-2 py-1 rounded font-bold border border-sky-500/20">Live Cam</button>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div onclick="setStockMedia('https://assets.mixkit.co/videos/preview/mixkit-curious-cat-watching-tv-4444-large.mp4')" class="aspect-video bg-slate-800 rounded-lg cursor-pointer hover:ring-2 hover:ring-sky-500 transition flex items-center justify-center">
+                        <span class="text-[10px] text-slate-500">Stock Clip</span>
+                    </div>
+                </div>
+                <div id="rec-ui" class="hidden space-y-3 pt-4 border-t border-slate-800">
+                    <h4 class="text-[10px] font-black text-slate-500 uppercase">Recorder</h4>
+                    <button id="rec-btn" onclick="toggleRecording()" class="w-full py-3 bg-rose-500 hover:bg-rose-600 text-white rounded-xl font-bold shadow-lg transition">Start Recording</button>
+                    <p class="text-[9px] text-slate-500 text-center italic">Stopping will auto-create a new scene!</p>
+                </div>
+            </div>
+
+            <!-- Text -->
+            <div id="tab-text" class="tab-content hidden space-y-4">
+                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-widest">Text Overlays</h3>
+                <input type="text" id="text-input" oninput="applyText()" placeholder="Type caption..." class="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none text-sm text-white">
+                <div class="space-y-2">
+                    <button onclick="changeStyle('Fredoka', 'text-yellow-400')" class="w-full p-3 text-left bg-slate-800 border border-slate-700 rounded-xl hover:border-sky-500 transition">
+                        <span class="kids-font text-yellow-500 font-bold">Cartoon Yellow</span>
+                    </button>
+                    <button onclick="changeStyle('Inter', 'text-sky-400')" class="w-full p-3 text-left bg-slate-800 border border-slate-700 rounded-xl hover:border-sky-500 transition">
+                        <span class="font-bold text-sky-400">Neon Blue</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Audio & Filters -->
+            <div id="tab-audio" class="tab-content hidden space-y-4">
+                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-widest">Music</h3>
+                <div class="space-y-1">
+                    <button onclick="setMusic('Happy', 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3')" class="w-full text-left p-2 hover:bg-slate-800 rounded-lg flex items-center gap-3 group">
+                        <div class="w-8 h-8 bg-slate-800 border border-slate-700 rounded flex items-center justify-center text-sky-400 font-bold group-hover:bg-sky-500 group-hover:text-white transition">♫</div>
+                        <span class="text-xs font-semibold text-slate-300">Sunny Day</span>
+                    </button>
+                    <button onclick="setMusic('None', '')" class="text-xs text-slate-500 mt-2 hover:text-slate-300">Remove Music</button>
+                </div>
+                <hr class="border-slate-800">
+                <h3 class="font-bold text-slate-400 text-xs uppercase tracking-widest">Visual Filters</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="applyFilter('none')" class="p-2 border border-slate-700 rounded-lg text-[10px] font-bold bg-slate-800">None</button>
+                    <button onclick="applyFilter('sepia')" class="p-2 border border-slate-700 rounded-lg text-[10px] font-bold bg-amber-900/20 text-amber-500">Vintage</button>
+                    <button onclick="applyFilter('grayscale')" class="p-2 border border-slate-700 rounded-lg text-[10px] font-bold bg-slate-700 text-slate-300">B&W</button>
+                    <button onclick="applyFilter('bright')" class="p-2 border border-slate-700 rounded-lg text-[10px] font-bold bg-sky-900/20 text-sky-400">Vivid</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- CANVAS AREA -->
+        <main class="canvas-area flex flex-col items-center justify-center p-8 bg-slate-950">
+            <div class="video-canvas" id="canvas-container">
+                <video id="main-video" class="w-full h-full object-cover" autoplay playsinline loop></video>
+                <div id="text-overlay" class="overlay-text text-5xl kids-font"></div>
+                
+                <div id="rec-tag" class="hidden absolute top-4 right-4 flex items-center gap-2 bg-rose-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase">
+                    <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div> Recording
+                </div>
+            </div>
+
+            <!-- Playback Status -->
+            <div class="mt-6 flex items-center gap-4 bg-slate-900 px-6 py-3 rounded-full border border-slate-800 shadow-xl">
+                <button onclick="togglePlay()" class="text-sky-400 hover:text-sky-300 transition">
+                    <svg id="play-icon" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                </button>
+                <div class="h-4 w-[1px] bg-slate-700"></div>
+                <span id="time-display" class="text-xs font-mono text-slate-500 tracking-tighter">00:00 / 00:00</span>
+            </div>
+        </main>
+
+        <!-- TIMELINE AREA -->
+        <footer class="timeline-area bg-slate-900 border-t border-slate-800 overflow-hidden flex flex-col">
+            <div class="h-8 border-b border-slate-800 bg-slate-950/50 timeline-ruler relative">
+                <div id="playhead" class="absolute top-0 left-0 w-0.5 h-full bg-sky-500 z-10 shadow-[0_0_10px_#38bdf8]"></div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-4 space-y-2">
+                <div class="flex items-center gap-4 h-12">
+                    <div class="w-20 text-[10px] font-bold text-slate-500 uppercase">Video</div>
+                    <div id="tl-video-track" class="flex-1 h-full bg-slate-800/50 rounded-lg border border-slate-700 p-1 flex gap-1">
+                        <!-- Segments appear here -->
+                    </div>
+                </div>
+                <div class="flex items-center gap-4 h-8">
+                    <div class="w-20 text-[10px] font-bold text-slate-500 uppercase">Audio</div>
+                    <div class="flex-1 h-full bg-slate-800/30 rounded-lg border border-dashed border-slate-700 relative overflow-hidden">
+                        <div id="tl-audio-bar" class="hidden absolute left-0 h-full w-full bg-sky-500/10 flex items-center px-4">
+                             <div class="h-[1px] w-full bg-sky-500/30"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        let scenes = [];
+        let currentSceneIndex = 0;
+        let stream;
+        let mediaRecorder;
+        let recordedChunks = [];
+        
+        const video = document.getElementById('main-video');
+        const textOverlay = document.getElementById('text-overlay');
+        const scenesContainer = document.getElementById('scenes-container');
+        const tlVideoTrack = document.getElementById('tl-video-track');
+
+        function createNewScene(videoSrc = '') {
+            const newScene = {
+                id: Date.now(),
+                video: videoSrc,
+                text: '',
+                textStyle: 'text-yellow-400 kids-font',
+                filter: 'none',
+                music: '',
+                duration: 5.0
+            };
+            scenes.push(newScene);
+            renderScenes();
+            selectScene(scenes.length - 1);
+        }
+
+        function renderScenes() {
+            scenesContainer.innerHTML = '';
+            tlVideoTrack.innerHTML = '';
+            
+            scenes.forEach((scene, index) => {
+                // Asset Panel Item
+                const card = document.createElement('div');
+                card.className = `scene-card p-2 border-2 rounded-xl cursor-pointer transition ${index === currentSceneIndex ? 'active border-sky-500 bg-slate-800' : 'border-slate-800 bg-slate-900'}`;
+                card.onclick = () => selectScene(index);
+                card.innerHTML = `
+                    <div class="aspect-video bg-black rounded-lg mb-1 overflow-hidden flex items-center justify-center">
+                        ${scene.video ? `<video src="${scene.video}" class="w-full h-full object-cover"></video>` : '<span class="text-[10px] text-slate-700 italic">No video</span>'}
+                    </div>
+                    <div class="flex justify-between items-center px-1">
+                        <p class="text-[10px] font-bold ${index === currentSceneIndex ? 'text-sky-400' : 'text-slate-500'}">Scene ${index + 1}</p>
+                        <button onclick="event.stopPropagation(); deleteScene(${index})" class="text-slate-700 hover:text-rose-500">×</button>
+                    </div>
+                `;
+                scenesContainer.appendChild(card);
+
+                // Timeline Item
+                const block = document.createElement('div');
+                block.className = `h-full rounded border ${index === currentSceneIndex ? 'bg-sky-500 border-sky-400' : 'bg-slate-700 border-slate-600'} transition`;
+                block.style.width = '120px';
+                block.onclick = () => selectScene(index);
+                tlVideoTrack.appendChild(block);
+            });
+        }
+
+        function selectScene(index) {
+            if (!scenes[index]) return;
+            currentSceneIndex = index;
+            const scene = scenes[index];
+
+            // Update Video
+            video.src = scene.video || '';
+            video.className = "w-full h-full object-cover filter-" + scene.filter;
+            
+            // Update Text
+            textOverlay.innerText = scene.text;
+            textOverlay.className = `overlay-text text-5xl ${scene.textStyle}`;
+            document.getElementById('text-input').value = scene.text;
+
+            // Update Audio
+            if (scene.music) {
+                document.getElementById('tl-audio-bar').classList.remove('hidden');
+            } else {
+                document.getElementById('tl-audio-bar').classList.add('hidden');
+            }
+
+            renderScenes();
+            video.play().catch(() => {});
+        }
+
+        function deleteScene(index) {
+            scenes.splice(index, 1);
+            if (currentSceneIndex >= scenes.length) currentSceneIndex = Math.max(0, scenes.length - 1);
+            if (scenes.length === 0) createNewScene();
+            renderScenes();
+            selectScene(currentSceneIndex);
+        }
+
+        // --- Editing Functions ---
+
+        function applyText() {
+            const val = document.getElementById('text-input').value;
+            scenes[currentSceneIndex].text = val;
+            textOverlay.innerText = val;
+        }
+
+        function changeStyle(font, colorClass) {
+            const style = `${colorClass} ${font === 'Fredoka' ? 'kids-font' : ''}`;
+            scenes[currentSceneIndex].textStyle = style;
+            textOverlay.className = `overlay-text text-5xl ${style}`;
+        }
+
+        function applyFilter(filter) {
+            scenes[currentSceneIndex].filter = filter;
+            video.className = "w-full h-full object-cover filter-" + filter;
+        }
+
+        function setMusic(name, url) {
+            scenes[currentSceneIndex].music = url;
+            // For this simple version, we'll just toggle the visual bar
+            document.getElementById('tl-audio-bar').classList.toggle('hidden', !url);
+        }
+
+        // --- Video Logic ---
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                video.srcObject = stream;
+                document.getElementById('rec-ui').classList.remove('hidden');
+                switchTab('media');
+            } catch (err) {
+                alert("Camera access is needed to record!");
+            }
+        }
+
+        function toggleRecording() {
+            const btn = document.getElementById('rec-btn');
+            const tag = document.getElementById('rec-tag');
+            
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                mediaRecorder.stop();
+                btn.innerText = "Start Recording";
+                btn.classList.replace('bg-black', 'bg-rose-500');
+                tag.classList.add('hidden');
+            } else {
+                recordedChunks = [];
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.ondataavailable = e => recordedChunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: "video/webm" });
+                    const url = URL.createObjectURL(blob);
+                    video.srcObject = null;
+                    createNewScene(url); // Automatic new scene creation
+                };
+                mediaRecorder.start();
+                btn.innerText = "Stop & Save Scene";
+                btn.classList.replace('bg-rose-500', 'bg-black');
+                tag.classList.remove('hidden');
+            }
+        }
+
+        function setStockMedia(url) {
+            video.srcObject = null;
+            scenes[currentSceneIndex].video = url;
+            selectScene(currentSceneIndex);
+        }
+
+        function togglePlay() {
+            if (video.paused) {
+                video.play();
+                document.getElementById('play-icon').innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+            } else {
+                video.pause();
+                document.getElementById('play-icon').innerHTML = '<polygon points="5 3 19 12 5 21 5 3"/>';
+            }
+        }
+
+        function downloadCurrentScene() {
+            const scene = scenes[currentSceneIndex];
+            if (!scene.video || scene.video.startsWith('http')) {
+                alert("Only recorded clips can be downloaded in this demo!");
+                return;
+            }
+            const a = document.createElement('a');
+            a.href = scene.video;
+            a.download = `scene-${currentSceneIndex + 1}.webm`;
+            a.click();
+        }
+
+        // --- UI Logic ---
+
+        function switchTab(id, event) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+            const targetTab = document.getElementById('tab-' + id);
+            if (targetTab) targetTab.classList.remove('hidden');
+
+            document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.remove('active-tab'));
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.add('active-tab');
+            } else {
+                const btn = document.getElementById('btn-' + id);
+                if (btn) btn.classList.add('active-tab');
+            }
+        }
+
+        // Update playhead and time
+        video.ontimeupdate = () => {
+            const progress = (video.currentTime / video.duration) * 100 || 0;
+            document.getElementById('playhead').style.left = progress + "%";
+            
+            const cur = Math.floor(video.currentTime);
+            const dur = Math.floor(video.duration) || 0;
+            document.getElementById('time-display').innerText = `00:${cur < 10 ? '0' : ''}${cur} / 00:${dur < 10 ? '0' : ''}${dur}`;
+        };
+
+        window.onload = () => {
+            createNewScene();
+            switchTab('scenes');
+        };
+    </script>
+</body>
+</html>
