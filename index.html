@@ -1,533 +1,185 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Remo OS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #000;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100vh;
-            width: 100vw;
-            color: white;
-            user-select: none;
-            transition: filter 0.3s ease;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rohans Web Search</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 
-        .phone-container {
-            width: 100vw;
-            height: 100vh;
-            position: relative;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            display: flex;
-            flex-direction: column;
-        }
+  <style>
+    :root {
+      --christmas-red: #DB4437;
+      --christmas-green: #0F9D58;
+      --christmas-text: #555;
+      --christmas-bg: #FFFFFF;
 
-        .screen-content {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-        }
+      --fun-bg: linear-gradient(135deg, #ff6ec4, #7873f5, #4ade80, #facc15);
+    }
 
-        .setup-step {
-            display: none;
-            padding: 2rem;
-            height: 100%;
-            flex-direction: column;
-            justify-content: center;
-        }
+    body {
+      font-family: 'Inter', sans-serif;
+      transition: background 0.5s ease, color 0.5s ease;
+    }
 
-        .setup-step.active {
-            display: flex;
-            animation: fadeIn 0.4s ease-out;
-        }
+    #artwork {
+      display: none;
+      padding: 40px;
+      border-radius: 20px;
+      background: var(--fun-bg);
+      color: white;
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+      animation: glow 4s infinite alternate;
+    }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .app-icon {
-            transition: transform 0.2s, background 0.2s;
-            cursor: pointer;
-        }
-
-        .app-icon:active {
-            transform: scale(0.9);
-        }
-
-        .status-bar {
-            height: 34px;
-            padding: 0 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 13px;
-            font-weight: 500;
-            z-index: 100;
-            background: rgba(0,0,0,0.1);
-        }
-
-        .nav-bar {
-            height: 60px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(15px);
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 100;
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        .app-window {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #f4f4f5;
-            z-index: 50;
-            display: none;
-            flex-direction: column;
-            color: black;
-            animation: appOpen 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes appOpen {
-            from { transform: scale(0.92); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        .wallpaper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: -1;
-            filter: brightness(0.75);
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dock {
-            margin: 0 20px 20px 20px;
-            padding: 12px;
-            border-radius: 24px;
-        }
-    </style>
+    @keyframes glow {
+      from { box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+      to   { box-shadow: 0 0 40px rgba(255,255,255,0.8); }
+    }
+  </style>
 </head>
-<body>
 
-<div class="phone-container">
-    <div id="boot-screen" class="absolute inset-0 z-[200] bg-black flex flex-col items-center justify-center">
-        <div class="text-5xl font-bold tracking-tighter mb-6 text-white">remo<span class="text-blue-500">OS</span></div>
-        <div class="w-32 h-1 bg-gray-800 rounded-full overflow-hidden">
-            <div id="boot-progress" class="h-full bg-blue-500 w-0 transition-all duration-[2000ms]"></div>
-        </div>
+<body class="p-4 md:p-8">
+
+  <div class="max-w-4xl mx-auto flex flex-col items-center pt-20">
+
+    <!-- Christmas Image -->
+    <div id="christmasImage" class="mb-8 text-center">
+      <a href="https://www.rohansweb.co.uk" target="_blank"
+         class="block w-full max-w-xl mx-auto transform transition duration-300 hover:scale-105">
+        <img src="https://i.postimg.cc/26qX8w4Y/Gemini-Generated-Image-teo2mkteo2mkteo2-2.jpg"
+             alt="Rohans Web Search Christmas Logo"
+             class="mx-auto w-full rounded-lg shadow-2xl" />
+      </a>
     </div>
 
-    <div class="status-bar" id="status-bar" style="display: none;">
-        <span id="system-time">12:00</span>
-        <div class="flex items-center gap-3">
-            <i class="fas fa-signal"></i>
-            <i class="fas fa-wifi"></i>
-            <i class="fas fa-battery-full"></i>
-        </div>
+    <!-- Non‑December Artwork -->
+    <div id="artwork"></div>
+
+    <p id="subtitle" class="text-xl mb-6 text-center font-light text-gray-500">
+      The festive search experience, powered by Rohan.
+    </p>
+
+    <div class="flex flex-col items-center mb-12 space-y-4">
+      <div id="countdown" class="text-2xl font-semibold p-3 rounded-lg shadow-md"
+           style="color: var(--christmas-green); border: 2px solid var(--christmas-red);"></div>
+
+      <div id="joke" class="text-lg italic text-gray-600 max-w-xl text-center"></div>
     </div>
 
-    <div class="screen-content">
-        <div id="setup-wizard" style="display: none;" class="h-full bg-slate-900">
-            <div class="setup-step active" id="step-1">
-                <div class="mb-12 text-center">
-                    <div class="w-24 h-24 bg-blue-600 rounded-[2rem] mx-auto flex items-center justify-center mb-8 shadow-2xl shadow-blue-500/20">
-                        <i class="fas fa-bolt text-4xl"></i>
-                    </div>
-                    <h1 class="text-4xl font-bold mb-3">remoOS</h1>
-                    <p class="text-gray-400 text-lg">Experience the full screen power.</p>
-                </div>
-                <button onclick="nextStep(2)" class="w-full max-w-md mx-auto bg-blue-600 text-white py-5 rounded-3xl font-bold text-xl hover:bg-blue-700 active:scale-95 transition-all">
-                    Get Started <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-            </div>
-
-            <div class="setup-step" id="step-2">
-                <h2 class="text-3xl font-bold mb-8">Select Language</h2>
-                <div class="space-y-4 max-w-md mx-auto w-full">
-                    <button onclick="setLang('English')" class="lang-btn w-full text-left p-6 glass rounded-2xl flex justify-between items-center text-lg border-blue-500">
-                        English <i class="fas fa-check-circle text-blue-500"></i>
-                    </button>
-                    <button onclick="setLang('Spanish')" class="lang-btn w-full text-left p-6 glass rounded-2xl opacity-50 text-lg">Spanish</button>
-                </div>
-                <button onclick="nextStep(3)" class="mt-auto w-full max-w-md mx-auto bg-white text-black py-5 rounded-3xl font-bold text-lg">Continue</button>
-            </div>
-
-            <div class="setup-step" id="step-3">
-                <div class="max-w-md mx-auto w-full">
-                    <i class="fas fa-wifi text-5xl text-blue-500 mb-6"></i>
-                    <h2 class="text-3xl font-bold mb-2">Connect to Wi-Fi</h2>
-                    <p class="text-gray-400 mb-8 text-lg">Stay updated with Remo Cloud.</p>
-                    <div class="space-y-4">
-                        <div onclick="nextStep(4)" class="w-full p-5 glass rounded-2xl flex items-center gap-4 cursor-pointer hover:bg-white/20">
-                            <i class="fas fa-lock text-gray-500"></i>
-                            <span class="flex-1 text-lg">Remo_Super_Fiber</span>
-                            <i class="fas fa-signal"></i>
-                        </div>
-                    </div>
-                </div>
-                <button onclick="nextStep(4)" class="mt-auto text-gray-400 py-6 font-semibold text-lg">Skip for now</button>
-            </div>
-
-            <div class="setup-step" id="step-4">
-                <div class="max-w-md mx-auto w-full text-center">
-                    <h2 class="text-3xl font-bold mb-8">Personalize</h2>
-                    <div class="flex flex-col items-center mb-10">
-                        <div class="w-32 h-32 bg-slate-800 rounded-full flex items-center justify-center mb-6 border-4 border-blue-600 shadow-xl">
-                            <i class="fas fa-user-astronaut text-5xl"></i>
-                        </div>
-                        <input type="text" id="username-input" placeholder="Enter Your Name" class="w-full bg-transparent border-b-2 border-blue-500 p-3 text-center text-2xl outline-none focus:border-white transition-all">
-                    </div>
-                    <button onclick="finishSetup()" class="w-full bg-blue-600 text-white py-5 rounded-3xl font-bold text-xl shadow-lg shadow-blue-600/30">Finish Setup</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="home-screen" style="display: none;" class="h-full flex flex-col p-8 pt-16">
-            <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=2670&auto=format&fit=crop" alt="wallpaper" class="wallpaper">
-            
-            <div class="mb-12 text-center">
-                <div class="text-7xl font-extralight tracking-tighter" id="clock-big">12:00</div>
-                <div class="text-xl font-medium opacity-90 mt-2" id="date-text">Thursday, Jan 22</div>
-            </div>
-
-            <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-y-10 gap-x-6 max-w-4xl mx-auto w-full">
-                <div class="flex flex-col items-center gap-2" onclick="openApp('browser')">
-                    <div class="app-icon w-16 h-16 bg-gradient-to-tr from-blue-400 to-blue-600 rounded-[1.25rem] flex items-center justify-center shadow-xl">
-                        <i class="fas fa-globe text-3xl"></i>
-                    </div>
-                    <span class="text-xs font-semibold">Browser</span>
-                </div>
-                <div class="flex flex-col items-center gap-2" onclick="openApp('calc')">
-                    <div class="app-icon w-16 h-16 bg-gradient-to-tr from-orange-400 to-orange-600 rounded-[1.25rem] flex items-center justify-center shadow-xl">
-                        <i class="fas fa-calculator text-3xl"></i>
-                    </div>
-                    <span class="text-xs font-semibold">Calculator</span>
-                </div>
-                <div class="flex flex-col items-center gap-2" onclick="openApp('notes')">
-                    <div class="app-icon w-16 h-16 bg-gradient-to-tr from-yellow-300 to-yellow-500 rounded-[1.25rem] flex items-center justify-center shadow-xl">
-                        <i class="fas fa-sticky-note text-3xl text-yellow-900"></i>
-                    </div>
-                    <span class="text-xs font-semibold">Notes</span>
-                </div>
-                <div class="flex flex-col items-center gap-2" onclick="openApp('settings')">
-                    <div class="app-icon w-16 h-16 bg-gradient-to-tr from-gray-600 to-gray-800 rounded-[1.25rem] flex items-center justify-center shadow-xl">
-                        <i class="fas fa-cog text-3xl"></i>
-                    </div>
-                    <span class="text-xs font-semibold">Settings</span>
-                </div>
-            </div>
-
-            <div class="mt-auto glass dock flex justify-around items-center max-w-lg mx-auto w-full">
-                <i class="fas fa-comment-dots text-3xl text-blue-400 cursor-pointer active:scale-125 transition-transform" onclick="notImplemented()"></i>
-                <i class="fas fa-envelope text-3xl text-rose-400 cursor-pointer active:scale-125 transition-transform" onclick="notImplemented()"></i>
-                <i class="fas fa-play-circle text-4xl text-green-400 cursor-pointer active:scale-125 transition-transform" onclick="notImplemented()"></i>
-                <i class="fas fa-users text-3xl text-amber-400 cursor-pointer active:scale-125 transition-transform" onclick="notImplemented()"></i>
-            </div>
-        </div>
-
-        <div id="app-calc" class="app-window">
-            <div class="p-6 bg-white border-b flex justify-between items-center">
-                <span class="font-bold text-xl text-gray-800">Calculator</span>
-                <i class="fas fa-times text-gray-400 text-xl cursor-pointer" onclick="closeApp()"></i>
-            </div>
-            <div class="flex-1 bg-black text-white p-6 flex flex-col justify-end">
-                <div id="calc-display" class="text-right text-7xl mb-12 font-extralight overflow-hidden px-4">0</div>
-                <div class="grid grid-cols-4 gap-4 max-w-xl mx-auto w-full pb-8">
-                    <button onclick="calcClear()" class="bg-gray-700 h-16 w-16 rounded-full text-lg">AC</button>
-                    <button onclick="calcOp('+-')" class="bg-gray-700 h-16 w-16 rounded-full text-lg">+/-</button>
-                    <button onclick="calcOp('%')" class="bg-gray-700 h-16 w-16 rounded-full text-lg">%</button>
-                    <button onclick="calcOp('/')" class="bg-orange-500 h-16 w-16 rounded-full text-2xl">÷</button>
-                    <button onclick="calcNum(7)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">7</button>
-                    <button onclick="calcNum(8)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">8</button>
-                    <button onclick="calcNum(9)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">9</button>
-                    <button onclick="calcOp('*')" class="bg-orange-500 h-16 w-16 rounded-full text-2xl">×</button>
-                    <button onclick="calcNum(4)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">4</button>
-                    <button onclick="calcNum(5)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">5</button>
-                    <button onclick="calcNum(6)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">6</button>
-                    <button onclick="calcOp('-')" class="bg-orange-500 h-16 w-16 rounded-full text-2xl">−</button>
-                    <button onclick="calcNum(1)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">1</button>
-                    <button onclick="calcNum(2)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">2</button>
-                    <button onclick="calcNum(3)" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">3</button>
-                    <button onclick="calcOp('+')" class="bg-orange-500 h-16 w-16 rounded-full text-2xl">+</button>
-                    <button onclick="calcNum(0)" class="col-span-2 bg-zinc-800 h-16 rounded-full text-2xl text-left pl-8">0</button>
-                    <button onclick="calcNum('.')" class="bg-zinc-800 h-16 w-16 rounded-full text-2xl">.</button>
-                    <button onclick="calcResult()" class="bg-orange-500 h-16 w-16 rounded-full text-2xl">=</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="app-notes" class="app-window">
-            <div class="p-6 bg-white border-b flex justify-between items-center">
-                <span class="font-bold text-xl">Cloud Notes</span>
-                <i class="fas fa-times text-gray-400 text-xl cursor-pointer" onclick="closeApp()"></i>
-            </div>
-            <textarea id="notes-area" oninput="saveNotes()" class="flex-1 p-8 text-xl outline-none resize-none bg-yellow-50" placeholder="Jot down your thoughts..."></textarea>
-            <div class="p-6 border-t bg-white text-gray-400 flex justify-between items-center">
-                <span id="sync-status" class="text-sm">Not saved</span>
-                <i class="fas fa-check-circle text-green-500"></i>
-            </div>
-        </div>
-
-        <div id="app-browser" class="app-window">
-            <div class="p-4 bg-gray-100 flex items-center gap-3">
-                <i class="fas fa-chevron-left text-gray-400 cursor-pointer" onclick="resetBrowser()"></i>
-                <div class="flex-1 bg-white border rounded-full px-5 py-2 text-sm flex items-center gap-2">
-                    <i class="fas fa-lock text-green-600 text-[10px]"></i>
-                    <input type="text" id="browser-url" value="https://www.google.com" class="bg-transparent w-full outline-none" readonly>
-                </div>
-            </div>
-            <div id="browser-home" class="flex-1 bg-white flex flex-col items-center justify-center p-10">
-                <div class="text-6xl font-bold mb-8 tracking-tighter">
-                    <span class="text-blue-500">G</span><span class="text-red-500">o</span><span class="text-yellow-500">o</span><span class="text-blue-500">g</span><span class="text-green-500">l</span><span class="text-red-500">e</span>
-                </div>
-                <form onsubmit="handleSearch(event)" class="w-full max-w-lg bg-gray-50 border rounded-full p-4 mb-10 flex items-center gap-4 shadow-sm">
-                    <i class="fas fa-search text-gray-400"></i>
-                    <input type="text" id="browser-search" placeholder="Search the web..." class="bg-transparent outline-none flex-1 text-lg">
-                    <button type="submit"><i class="fas fa-arrow-right text-blue-500"></i></button>
-                </form>
-            </div>
-            <div id="browser-results" class="hidden flex-1 bg-white p-6 overflow-y-auto">
-                <div class="text-xl font-bold mb-4" id="results-query">Results for ...</div>
-                <div class="space-y-4">
-                    <div class="p-4 bg-gray-50 rounded-xl">
-                        <div class="text-blue-600 font-medium">Official remoOS Simulation</div>
-                        <div class="text-sm text-gray-500">Live web application environment.</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div id="app-settings" class="app-window">
-            <div class="p-6 bg-white border-b flex items-center gap-4">
-                <i class="fas fa-arrow-left text-gray-400 text-xl cursor-pointer" onclick="closeApp()"></i>
-                <span class="font-bold text-xl">Settings</span>
-            </div>
-            <div class="flex-1 bg-slate-50 overflow-y-auto">
-                <div class="p-6 max-w-2xl mx-auto w-full">
-                    <div class="bg-white rounded-3xl shadow-sm border p-6 mb-8 flex items-center gap-5">
-                        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                            <i class="fas fa-user-circle text-blue-600 text-4xl"></i>
-                        </div>
-                        <div class="flex-1">
-                            <input type="text" id="settings-name-input" onchange="updateProfileName(this.value)" class="font-bold text-xl bg-transparent outline-none border-b border-transparent focus:border-blue-500 w-full" value="Remo User">
-                            <div class="text-sm text-gray-500" id="setting-user-display">Remo User</div>
-                        </div>
-                    </div>
-
-                    <div class="bg-white rounded-3xl shadow-sm border overflow-hidden">
-                        <div class="p-5 flex items-center gap-4 border-b" onclick="toggleDarkMode()">
-                            <div class="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center"><i class="fas fa-moon text-white"></i></div>
-                            <span class="flex-1 font-medium">Dark Mode</span>
-                            <div class="w-12 h-6 bg-gray-200 rounded-full relative transition-colors" id="darkmode-toggle">
-                                <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all" id="darkmode-thumb"></div>
-                            </div>
-                        </div>
-                        <div class="p-5 flex items-center gap-4 text-red-500" onclick="resetOS()">
-                            <div class="w-10 h-10 bg-red-500 rounded-xl flex items-center justify-center"><i class="fas fa-trash text-white"></i></div>
-                            <span class="flex-1 font-medium">Reset remoOS</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="w-full max-w-2xl">
+      <script async src="https://cse.google.com/cse.js?cx=00c43c37b85874aa1"></script>
+      <div class="gcse-search"></div>
     </div>
+  </div>
 
-    <div class="nav-bar" id="nav-bar" style="display: none;">
-        <i class="fas fa-chevron-left text-white/50 text-xl cursor-pointer hover:text-white" onclick="closeApp()"></i>
-        <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center cursor-pointer hover:bg-white/20" onclick="closeApp()">
-             <i class="far fa-circle text-white text-2xl"></i>
-        </div>
-        <i class="fas fa-th-large text-white/50 text-xl cursor-pointer hover:text-white" onclick="showSwitcher()"></i>
-    </div>
-</div>
+  <script>
+    const jokes = [
+      "What do you call an elf who sings? A wrapper!",
+      "Why did the Christmas tree go to the dentist? Because it needed a root canal!",
+      "What do you get if you cross Santa with a detective? Santa Clues!",
+      "What kind of motor vehicle does Santa drive? A 'Ho Ho Ho-nda'!",
+      "What is a Christmas ornament's favorite song? 'O Tannen-bomb'!",
+      "What is Santa's favorite snack food? Crisp Pringles!",
+      "What do you call a reindeer with no eyes? I have no eye-deer!",
+    ];
 
-<script>
-    let currentStep = 1;
-    let userName = "Remo User";
-    let calcBuffer = "0";
-    let isDarkMode = false;
+    function updateCountdown() {
+      const now = new Date();
+      const christmas = new Date(now.getFullYear(), 11, 25);
 
-    window.addEventListener('load', () => {
-        const progress = document.getElementById('boot-progress');
-        setTimeout(() => {
-            progress.style.width = '100%';
-            setTimeout(() => {
-                const bootScreen = document.getElementById('boot-screen');
-                bootScreen.style.opacity = '0';
-                setTimeout(() => {
-                    bootScreen.style.display = 'none';
-                    document.getElementById('setup-wizard').style.display = 'block';
-                }, 500);
-            }, 2200);
-        }, 300);
-    });
+      if (now.getMonth() === 11 && now.getDate() > 25) {
+        christmas.setFullYear(christmas.getFullYear() + 1);
+      }
 
-    function nextStep(step) {
-        document.querySelector(`#step-${currentStep}`).style.display = 'none';
-        const next = document.querySelector(`#step-${step}`);
-        next.style.display = 'flex';
-        next.classList.add('active');
-        currentStep = step;
+      const diff = christmas - now;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const countdownEl = document.getElementById('countdown');
+
+      countdownEl.textContent =
+        days < 0 ? "🎄 Merry Christmas!" :
+        days === 0 ? "🎅 It's Christmas Day!" :
+        `${days} days until Christmas`;
     }
 
-    function setLang(lang) {
-        document.querySelectorAll('.lang-btn').forEach(b => {
-            b.classList.add('opacity-50');
-            b.classList.remove('border-blue-500');
-        });
-        event.currentTarget.classList.remove('opacity-50');
-        event.currentTarget.classList.add('border-blue-500');
+    function displayJoke() {
+      const jokeEl = document.getElementById('joke');
+      const randomIndex = Math.floor(Math.random() * jokes.length);
+      jokeEl.textContent = `Joke of the Day: "${jokes[randomIndex]}"`;
     }
 
-    function finishSetup() {
-        userName = document.getElementById('username-input').value || "Remo User";
-        updateProfileName(userName);
-        
-        document.getElementById('setup-wizard').style.display = 'none';
-        document.getElementById('home-screen').style.display = 'flex';
-        document.getElementById('status-bar').style.display = 'flex';
-        document.getElementById('nav-bar').style.display = 'flex';
-        
-        startClock();
+    function updateArtwork() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const time = now.toLocaleTimeString();
+      document.getElementById("artwork").textContent = `${year} • ${time}`;
     }
 
-    function startClock() {
-        const update = () => {
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('system-time').innerText = timeStr;
-            const bigClock = document.getElementById('clock-big');
-            if (bigClock) bigClock.innerText = timeStr;
-            const dateText = document.getElementById('date-text');
-            if (dateText) {
-                const options = { weekday: 'long', month: 'short', day: 'numeric' };
-                dateText.innerText = now.toLocaleDateString('en-US', options);
-            }
-        };
-        setInterval(update, 1000);
-        update();
+    function applySeasonalMode() {
+      const now = new Date();
+      const month = now.getMonth();
+
+      const christmasImg = document.getElementById("christmasImage");
+      const artwork = document.getElementById("artwork");
+      const countdown = document.getElementById("countdown");
+      const joke = document.getElementById("joke");
+      const subtitle = document.getElementById("subtitle");
+
+      if (month === 11) {
+        // 🎄 DECEMBER MODE
+        christmasImg.style.display = "block";
+        countdown.style.display = "block";
+        joke.style.display = "none"; // You asked to hide joke in December
+        artwork.style.display = "none";
+
+        document.body.style.background = "var(--christmas-bg)";
+        document.body.style.color = "var(--christmas-text)";
+        subtitle.textContent = "The festive search experience, powered by Rohan.";
+
+        updateCountdown();
+        setInterval(updateCountdown, 1000 * 60 * 60 * 24);
+
+      } else {
+        // 🌈 NON‑DECEMBER MODE
+        christmasImg.style.display = "none";
+        countdown.style.display = "none";
+        joke.style.display = "none";
+        artwork.style.display = "block";
+
+        document.body.style.background = "var(--fun-bg)";
+        document.body.style.color = "white";
+        subtitle.textContent = "A colourful search experience, powered by Rohan.";
+
+        updateArtwork();
+        setInterval(updateArtwork, 1000);
+      }
     }
 
-    function openApp(appId) {
-        document.querySelectorAll('.app-window').forEach(w => w.style.display = 'none');
-        document.getElementById(`app-${appId}`).style.display = 'flex';
-        document.getElementById('nav-bar').style.background = 'rgba(0,0,0,0.85)';
+    function forceLinksNewTab() {
+      document.querySelectorAll('.gs-webResult .gs-title a').forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+      });
     }
 
-    function closeApp() {
-        document.querySelectorAll('.app-window').forEach(w => w.style.display = 'none');
-        document.getElementById('nav-bar').style.background = 'rgba(0,0,0,0.4)';
+    function setupObserver() {
+      const target = document.querySelector('.gcse-search');
+      if (!target) {
+        setTimeout(setupObserver, 500);
+        return;
+      }
+      forceLinksNewTab();
+      const observer = new MutationObserver(() => forceLinksNewTab());
+      observer.observe(target, { childList: true, subtree: true });
     }
 
-    function updateProfileName(val) {
-        userName = val;
-        const display = document.getElementById('setting-user-display');
-        const input = document.getElementById('settings-name-input');
-        if (display) display.innerText = val;
-        if (input) input.value = val;
-    }
-
-    function toggleDarkMode() {
-        isDarkMode = !isDarkMode;
-        const toggle = document.getElementById('darkmode-toggle');
-        const thumb = document.getElementById('darkmode-thumb');
-        if (isDarkMode) {
-            toggle.classList.replace('bg-gray-200', 'bg-blue-600');
-            thumb.style.left = '24px';
-            document.querySelector('.phone-container').style.filter = 'brightness(0.8) sepia(0.2)';
-        } else {
-            toggle.classList.replace('bg-blue-600', 'bg-gray-200');
-            thumb.style.left = '4px';
-            document.querySelector('.phone-container').style.filter = 'none';
-        }
-    }
-
-    function resetOS() {
-        location.reload();
-    }
-
-    function handleSearch(e) {
-        e.preventDefault();
-        const query = document.getElementById('browser-search').value;
-        if (!query) return;
-        document.getElementById('browser-home').classList.add('hidden');
-        document.getElementById('browser-results').classList.remove('hidden');
-        document.getElementById('results-query').innerText = `Results for "${query}"`;
-        document.getElementById('browser-url').value = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-    }
-
-    function resetBrowser() {
-        document.getElementById('browser-home').classList.remove('hidden');
-        document.getElementById('browser-results').classList.add('hidden');
-        document.getElementById('browser-url').value = "https://www.google.com";
-    }
-
-    function saveNotes() {
-        const status = document.getElementById('sync-status');
-        status.innerText = "Saving...";
-        setTimeout(() => {
-            status.innerText = "Saved " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        }, 500);
-    }
-
-    function calcNum(n) {
-        if (calcBuffer === "0" && n !== ".") calcBuffer = "";
-        calcBuffer += n;
-        document.getElementById('calc-display').innerText = calcBuffer;
-    }
-    function calcOp(op) {
-        if (op === '+-') {
-            calcBuffer = calcBuffer.startsWith('-') ? calcBuffer.substring(1) : '-' + calcBuffer;
-        } else if (op === '%') {
-            calcBuffer = (parseFloat(calcBuffer) / 100).toString();
-        } else {
-            calcBuffer += " " + op + " ";
-        }
-        document.getElementById('calc-display').innerText = calcBuffer;
-    }
-    function calcClear() {
-        calcBuffer = "0";
-        document.getElementById('calc-display').innerText = calcBuffer;
-    }
-    function calcResult() {
-        try {
-            let expr = calcBuffer.replace(/×/g, '*').replace(/÷/g, '/');
-            calcBuffer = eval(expr).toString();
-            document.getElementById('calc-display').innerText = calcBuffer;
-        } catch(e) {
-            calcBuffer = "Error";
-            document.getElementById('calc-display').innerText = calcBuffer;
-        }
-    }
-    function showSwitcher() {
-        document.body.style.filter = 'grayscale(1)';
-        setTimeout(() => document.body.style.filter = 'none', 300);
-    }
-    function notImplemented() { console.log("Feature pending."); }
-</script>
+    window.onload = () => {
+      applySeasonalMode();
+      setupObserver();
+    };
+  </script>
 
 </body>
 </html>
