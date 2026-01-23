@@ -1,185 +1,425 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rohans Web Search</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Remo OS - Fully Loaded</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+        
+        :root {
+            --android-blue: #4285F4;
+            --surface: #ffffff;
+            --on-surface: #1d1b20;
+        }
 
-  <style>
-    :root {
-      --christmas-red: #DB4437;
-      --christmas-green: #0F9D58;
-      --christmas-text: #555;
-      --christmas-bg: #FFFFFF;
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #000;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            color: white;
+            user-select: none;
+        }
 
-      --fun-bg: linear-gradient(135deg, #ff6ec4, #7873f5, #4ade80, #facc15);
-    }
+        #wallpaper-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-    body {
-      font-family: 'Inter', sans-serif;
-      transition: background 0.5s ease, color 0.5s ease;
-    }
+        .phone-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            z-index: 1;
+        }
 
-    #artwork {
-      display: none;
-      padding: 40px;
-      border-radius: 20px;
-      background: var(--fun-bg);
-      color: white;
-      font-size: 3rem;
-      font-weight: 700;
-      text-align: center;
-      box-shadow: 0 0 20px rgba(0,0,0,0.2);
-      animation: glow 4s infinite alternate;
-    }
+        .app-window {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--surface);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            color: var(--on-surface);
+            animation: materialOpen 0.3s cubic-bezier(0.05, 0.7, 0.1, 1);
+        }
 
-    @keyframes glow {
-      from { box-shadow: 0 0 20px rgba(255,255,255,0.4); }
-      to   { box-shadow: 0 0 40px rgba(255,255,255,0.8); }
-    }
-  </style>
+        /* Compact Calculator Styles */
+        #app-calculator {
+            height: auto;
+            width: 90%;
+            max-width: 320px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            background: #f3f4f6;
+            padding-bottom: 20px;
+        }
+
+        @keyframes materialOpen {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Nav & Status Bar */
+        .status-bar { height: 32px; padding: 0 16px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 500; z-index: 1000; background: rgba(0,0,0,0.2); cursor: pointer; }
+        .nav-bar { height: 56px; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: flex; justify-content: space-around; align-items: center; z-index: 1001; }
+        .nav-btn { width: 60px; height: 50px; display: flex; align-items: center; justify-content: center; color: white; transition: opacity 0.2s; }
+        .nav-btn:active { opacity: 0.5; }
+
+        /* Icons */
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 20px; }
+        .android-icon { width: 58px; height: 58px; border-radius: 16px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); font-size: 24px; margin-bottom: 6px; transition: transform 0.1s; }
+        .android-icon:active { transform: scale(0.9); }
+        .android-label { font-size: 11px; text-align: center; text-shadow: 0 1px 3px rgba(0,0,0,0.8); font-weight: 500; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        #notification-shade { position: absolute; top: -100%; left: 0; width: 100%; height: 100%; background: rgba(15, 15, 15, 0.98); backdrop-filter: blur(40px); z-index: 2000; transition: top 0.4s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; }
+        .toggle-icon { width: 52px; height: 52px; border-radius: 50%; background: #2a2a2a; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: background 0.3s; }
+        .toggle-icon.active { background: var(--android-blue); color: white; }
+
+        .setting-row { padding: 18px 24px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid #f3f4f6; }
+        .custom-scroll { overflow-y: auto; scrollbar-width: none; }
+        .custom-scroll::-webkit-scrollbar { display: none; }
+
+        .calc-btn { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; font-weight: 500; }
+        
+        #setup-wizard { position: absolute; inset: 0; background: white; color: black; z-index: 4000; display: none; flex-direction: column; padding: 40px 24px; }
+        .setup-step { display: none; flex-direction: column; height: 100%; }
+        .setup-step.active { display: flex; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
 </head>
+<body>
 
-<body class="p-4 md:p-8">
+    <div id="wallpaper-bg" style="background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80');"></div>
 
-  <div class="max-w-4xl mx-auto flex flex-col items-center pt-20">
+    <div class="phone-container">
+        
+        <!-- Setup Wizard -->
+        <div id="setup-wizard">
+            <div id="step-1" class="setup-step active">
+                <div class="flex-1 flex flex-col justify-center items-center text-center">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-3xl flex items-center justify-center text-4xl mb-8 shadow-xl">R</div>
+                    <h1 class="text-4xl font-bold mb-4">Welcome</h1>
+                    <p class="text-gray-500 mb-12">Experience the future of Remo OS. Let's get you set up.</p>
+                    <select class="w-full p-4 bg-gray-100 rounded-2xl outline-none font-medium mb-4">
+                        <option>English (United States)</option>
+                        <option>Español</option>
+                        <option>Français</option>
+                    </select>
+                </div>
+                <button onclick="nextSetup(2)" class="w-full py-5 bg-blue-600 text-white rounded-2xl font-bold text-lg shadow-lg">Start</button>
+            </div>
 
-    <!-- Christmas Image -->
-    <div id="christmasImage" class="mb-8 text-center">
-      <a href="https://www.rohansweb.co.uk" target="_blank"
-         class="block w-full max-w-xl mx-auto transform transition duration-300 hover:scale-105">
-        <img src="https://i.postimg.cc/26qX8w4Y/Gemini-Generated-Image-teo2mkteo2mkteo2-2.jpg"
-             alt="Rohans Web Search Christmas Logo"
-             class="mx-auto w-full rounded-lg shadow-2xl" />
-      </a>
+            <div id="step-2" class="setup-step">
+                <h1 class="text-3xl font-bold mb-2">Connect to Wi-Fi</h1>
+                <p class="text-gray-500 mb-8">Choose a network to continue.</p>
+                <div class="flex-1 space-y-2">
+                    <div class="p-4 bg-gray-50 rounded-xl flex items-center justify-between"><div class="flex items-center gap-4"><i class="fas fa-wifi"></i> <span>Remo_5G</span></div><i class="fas fa-lock text-xs text-gray-400"></i></div>
+                    <div class="p-4 bg-gray-50 rounded-xl flex items-center justify-between"><div class="flex items-center gap-4"><i class="fas fa-wifi"></i> <span>Coffee Shop</span></div></div>
+                </div>
+                <div class="flex gap-4">
+                    <button onclick="nextSetup(1)" class="flex-1 py-5 bg-gray-100 rounded-2xl font-bold">Back</button>
+                    <button onclick="nextSetup(3)" class="flex-1 py-5 bg-blue-600 text-white rounded-2xl font-bold shadow-lg">Skip</button>
+                </div>
+            </div>
+
+            <div id="step-3" class="setup-step text-center justify-center">
+                <i class="fas fa-check-circle text-7xl text-green-500 mb-6"></i>
+                <h1 class="text-3xl font-bold mb-2">All set!</h1>
+                <p class="text-gray-500 mb-10">Your Remo OS experience is ready.</p>
+                <button onclick="finishSetup()" class="w-full py-5 bg-black text-white rounded-2xl font-bold text-lg">Finish</button>
+            </div>
+        </div>
+
+        <!-- Notification Shade -->
+        <div id="notification-shade">
+            <div class="p-10 pb-4 flex justify-between items-center">
+                <span class="text-xl font-medium" id="shade-time">12:00</span>
+                <div class="flex gap-4 items-center">
+                    <i class="fas fa-cog text-xl p-2" onclick="openApp('settings')"></i>
+                    <i class="fas fa-times text-2xl p-2" onclick="toggleShade()"></i>
+                </div>
+            </div>
+            <div class="flex flex-wrap p-4">
+                <div class="flex flex-col items-center w-1/4 mb-6"><div class="toggle-icon active"><i class="fas fa-wifi"></i></div><span class="text-[10px] mt-1">Wi-Fi</span></div>
+                <div class="flex flex-col items-center w-1/4 mb-6"><div class="toggle-icon active"><i class="fas fa-bluetooth"></i></div><span class="text-[10px] mt-1">Bluetooth</span></div>
+                <div class="flex flex-col items-center w-1/4 mb-6"><div class="toggle-icon active"><i class="fas fa-flashlight"></i></div><span class="text-[10px] mt-1">Torch</span></div>
+                <div class="flex flex-col items-center w-1/4 mb-6"><div class="toggle-icon"><i class="fas fa-moon"></i></div><span class="text-[10px] mt-1">DND</span></div>
+            </div>
+            <div class="flex-1 custom-scroll p-4">
+                <div class="bg-white/10 p-4 rounded-2xl mb-4">
+                    <div class="flex justify-between text-xs mb-1"><span class="font-bold">System</span><span class="opacity-50">now</span></div>
+                    <p class="text-sm">Welcome to Remo OS v2.5</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar" onclick="toggleShade()">
+            <span id="system-time">12:00</span>
+            <div class="flex items-center gap-2"><i class="fas fa-signal"></i><i class="fas fa-wifi"></i><i class="fas fa-battery-full"></i></div>
+        </div>
+
+        <div class="screen-content flex-1 relative overflow-hidden">
+            <!-- Boot Screen -->
+            <div id="boot-screen" class="absolute inset-0 z-[3000] bg-black flex flex-col items-center justify-center transition-opacity duration-500">
+                <div class="text-5xl font-bold tracking-tighter text-white mb-2">REMO</div>
+                <div class="w-12 h-12 border-4 border-blue-500/10 border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+
+            <!-- Home Screen -->
+            <div id="home-screen" class="h-full flex flex-col pt-12 custom-scroll" style="display: none;">
+                <div class="px-10 mb-6">
+                    <div class="text-7xl font-light mb-1" id="home-clock">12:00</div>
+                    <div class="text-xl opacity-80" id="home-date">Friday, Jan 23</div>
+                </div>
+                <div class="app-grid">
+                    <div class="flex flex-col items-center" onclick="openApp('phone')"><div class="android-icon bg-green-500 text-white"><i class="fas fa-phone"></i></div><span class="android-label">Phone</span></div>
+                    <div class="flex flex-col items-center" onclick="openApp('messages')"><div class="android-icon bg-blue-500 text-white"><i class="fas fa-comment"></i></div><span class="android-label">Messages</span></div>
+                    <div class="flex flex-col items-center" onclick="openApp('browser')"><div class="android-icon bg-white text-blue-600"><i class="fab fa-chrome"></i></div><span class="android-label">Chrome</span></div>
+                    <div class="flex flex-col items-center" onclick="openApp('wallpapers')"><div class="android-icon bg-purple-600 text-white"><i class="fas fa-images"></i></div><span class="android-label">Gallery</span></div>
+                </div>
+            </div>
+
+            <!-- ALL APPS -->
+            <div id="app-library" class="app-window !bg-gray-50">
+                <div class="p-6 pt-10 bg-white shadow-sm flex items-center gap-4"><i class="fas fa-search text-gray-400"></i><input type="text" placeholder="Search apps..." class="bg-transparent flex-1 text-lg outline-none text-black"></div>
+                <div class="flex-1 custom-scroll pb-24">
+                    <div class="app-grid">
+                        <div class="flex flex-col items-center" onclick="openApp('phone')"><div class="android-icon bg-green-500 text-white"><i class="fas fa-phone"></i></div><span class="android-label text-black">Phone</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('messages')"><div class="android-icon bg-blue-500 text-white"><i class="fas fa-comment"></i></div><span class="android-label text-black">Messages</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('browser')"><div class="android-icon bg-white shadow text-blue-600"><i class="fab fa-chrome"></i></div><span class="android-label text-black">Chrome</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('wallpapers')"><div class="android-icon bg-purple-600 text-white"><i class="fas fa-images"></i></div><span class="android-label text-black">Gallery</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('settings')"><div class="android-icon bg-gray-600 text-white"><i class="fas fa-cog"></i></div><span class="android-label text-black">Settings</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('calculator')"><div class="android-icon bg-orange-500 text-white"><i class="fas fa-calculator"></i></div><span class="android-label text-black">Calculator</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('weather')"><div class="android-icon bg-blue-300 text-white"><i class="fas fa-cloud"></i></div><span class="android-label text-black">Weather</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('health')"><div class="android-icon bg-red-400 text-white"><i class="fas fa-heartbeat"></i></div><span class="android-label text-black">Health</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('tasks')"><div class="android-icon bg-teal-500 text-white"><i class="fas fa-check-double"></i></div><span class="android-label text-black">Tasks</span></div>
+                        <div class="flex flex-col items-center" onclick="openApp('clock')"><div class="android-icon bg-indigo-600 text-white"><i class="fas fa-stopwatch"></i></div><span class="android-label text-black">Clock</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPACT CALCULATOR -->
+            <div id="app-calculator" class="app-window" style="display: none; height: auto;">
+                <div class="p-6 pb-2 flex flex-col items-end">
+                    <div id="calc-hist" class="text-gray-400 text-sm h-6"></div>
+                    <div id="calc-display" class="text-4xl font-light text-black">0</div>
+                </div>
+                <div class="px-4 pb-4 grid grid-cols-4 gap-2">
+                    <button onclick="calc('AC')" class="calc-btn bg-gray-300 text-red-500">C</button>
+                    <button onclick="calc('/')" class="calc-btn bg-gray-200">÷</button>
+                    <button onclick="calc('*')" class="calc-btn bg-gray-200">×</button>
+                    <button onclick="calc('DEL')" class="calc-btn bg-gray-200"><i class="fas fa-backspace"></i></button>
+                    <button onclick="calc('7')" class="calc-btn bg-white">7</button>
+                    <button onclick="calc('8')" class="calc-btn bg-white">8</button>
+                    <button onclick="calc('9')" class="calc-btn bg-white">9</button>
+                    <button onclick="calc('-')" class="calc-btn bg-gray-200">-</button>
+                    <button onclick="calc('4')" class="calc-btn bg-white">4</button>
+                    <button onclick="calc('5')" class="calc-btn bg-white">5</button>
+                    <button onclick="calc('6')" class="calc-btn bg-white">6</button>
+                    <button onclick="calc('+')" class="calc-btn bg-gray-200">+</button>
+                    <button onclick="calc('1')" class="calc-btn bg-white">1</button>
+                    <button onclick="calc('2')" class="calc-btn bg-white">2</button>
+                    <button onclick="calc('3')" class="calc-btn bg-white">3</button>
+                    <button onclick="calc('=')" class="calc-btn bg-orange-500 text-white">=</button>
+                </div>
+            </div>
+
+            <!-- APP: WEATHER -->
+            <div id="app-weather" class="app-window !bg-blue-400 !text-white">
+                <div class="flex-1 flex flex-col items-center justify-center text-center">
+                    <p class="text-xl">San Francisco</p>
+                    <h1 class="text-7xl font-thin">22°</h1>
+                    <i class="fas fa-cloud-sun text-5xl mt-4"></i>
+                </div>
+            </div>
+
+            <!-- APP: HEALTH -->
+            <div id="app-health" class="app-window !bg-white">
+                <div class="p-8"><h1 class="text-3xl font-bold">Health</h1></div>
+                <div class="px-8 space-y-4">
+                    <div class="p-4 bg-red-50 rounded-2xl flex items-center gap-4">
+                        <i class="fas fa-shoe-prints text-red-500 text-2xl"></i>
+                        <div><p class="text-xs text-red-400 font-bold uppercase">Steps</p><p class="text-2xl font-bold text-red-600">8,432</p></div>
+                    </div>
+                    <div class="p-4 bg-orange-50 rounded-2xl flex items-center gap-4">
+                        <i class="fas fa-fire text-orange-500 text-2xl"></i>
+                        <div><p class="text-xs text-orange-400 font-bold uppercase">Calories</p><p class="text-2xl font-bold text-orange-600">420 kcal</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APP: TASKS -->
+            <div id="app-tasks" class="app-window !bg-white">
+                <div class="p-8 border-b"><h1 class="text-2xl font-bold">My Tasks</h1></div>
+                <div class="p-4 space-y-3">
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"><i class="far fa-circle text-teal-500"></i> <span>Review project proposal</span></div>
+                    <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl"><i class="fas fa-check-circle text-teal-500"></i> <span class="line-through text-gray-400">Buy groceries</span></div>
+                </div>
+            </div>
+
+            <!-- APP: MESSAGES -->
+            <div id="app-messages" class="app-window !bg-white">
+                <div class="p-6 border-b flex justify-between items-center"><h1 class="text-xl font-bold">Messages</h1><i class="fas fa-edit text-blue-500"></i></div>
+                <div class="flex-1 custom-scroll">
+                    <div class="p-4 flex gap-4 border-b">
+                        <div class="w-12 h-12 bg-gray-200 rounded-full"></div>
+                        <div class="flex-1">
+                            <div class="flex justify-between mb-1"><span class="font-bold">Alex</span><span class="text-xs text-gray-400">10:45 AM</span></div>
+                            <p class="text-sm text-gray-500">See you at the meeting!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- APP: PHONE -->
+            <div id="app-phone" class="app-window !bg-white">
+                <div class="flex-1 flex flex-col">
+                    <div class="p-8 text-center"><h1 class="text-4xl font-light py-8">Dialer</h1></div>
+                    <div class="grid grid-cols-3 gap-6 px-12 text-center text-2xl">
+                        <span>1</span><span>2</span><span>3</span>
+                        <span>4</span><span>5</span><span>6</span>
+                        <span>7</span><span>8</span><span>9</span>
+                        <span>*</span><span>0</span><span>#</span>
+                    </div>
+                    <div class="mt-auto mb-10 flex justify-center"><div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center text-white text-2xl"><i class="fas fa-phone"></i></div></div>
+                </div>
+            </div>
+
+            <!-- APP: SETTINGS -->
+            <div id="app-settings" class="app-window">
+                <div class="p-8 pb-4 sticky top-0 bg-white z-10"><h1 class="text-3xl font-bold mb-4">Settings</h1></div>
+                <div class="flex-1 custom-scroll pb-24">
+                    <div class="setting-row" onclick="openApp('wallpapers')"><div class="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-palette"></i></div><div><p class="font-bold">Wallpaper</p><p class="text-xs text-gray-400">Home & Lock screen</p></div></div>
+                    <div class="setting-row"><div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-wifi"></i></div><div><p class="font-bold">Network</p><p class="text-xs text-gray-400">Connected</p></div></div>
+                    <div class="setting-row"><div class="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center text-white"><i class="fas fa-battery-half"></i></div><div><p class="font-bold">Battery</p><p class="text-xs text-gray-400">88%</p></div></div>
+                </div>
+            </div>
+
+            <!-- APP: GALLERY -->
+            <div id="app-wallpapers" class="app-window">
+                <div class="p-6 font-bold text-xl border-b">Gallery</div>
+                <div class="flex-1 custom-scroll p-4 grid grid-cols-2 gap-4 pb-24">
+                    <div onclick="applyWall('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80')" class="h-64 rounded-2xl overflow-hidden bg-gray-200"><img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80" class="w-full h-full object-cover"></div>
+                    <div onclick="applyWall('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80')" class="h-64 rounded-2xl overflow-hidden bg-gray-200"><img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80" class="w-full h-full object-cover"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-bar" id="nav-bar" style="display: none;">
+            <div class="nav-btn" onclick="openApp('library')"><i class="fas fa-square text-sm opacity-50"></i></div>
+            <div class="nav-btn" onclick="closeApp()"><div class="w-10 h-10 rounded-full border-2 border-white/60 flex items-center justify-center"><div class="w-4 h-4 rounded-full bg-white"></div></div></div>
+            <div class="nav-btn" onclick="goBack()"><i class="fas fa-caret-left text-2xl opacity-50"></i></div>
+        </div>
     </div>
 
-    <!-- Non‑December Artwork -->
-    <div id="artwork"></div>
+    <script>
+        let isShadeOpen = false;
+        let currentCalc = "";
+        let setupCompleted = false;
 
-    <p id="subtitle" class="text-xl mb-6 text-center font-light text-gray-500">
-      The festive search experience, powered by Rohan.
-    </p>
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const boot = document.getElementById('boot-screen');
+                boot.style.opacity = '0';
+                setTimeout(() => {
+                    boot.style.display = 'none';
+                    document.getElementById('setup-wizard').style.display = 'flex';
+                    initTime();
+                }, 500);
+            }, 2500);
+        });
 
-    <div class="flex flex-col items-center mb-12 space-y-4">
-      <div id="countdown" class="text-2xl font-semibold p-3 rounded-lg shadow-md"
-           style="color: var(--christmas-green); border: 2px solid var(--christmas-red);"></div>
+        function nextSetup(step) {
+            document.querySelectorAll('.setup-step').forEach(s => s.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+        }
 
-      <div id="joke" class="text-lg italic text-gray-600 max-w-xl text-center"></div>
-    </div>
+        function finishSetup() {
+            document.getElementById('setup-wizard').style.display = 'none';
+            document.getElementById('home-screen').style.display = 'flex';
+            document.getElementById('nav-bar').style.display = 'flex';
+            setupCompleted = true;
+        }
 
-    <div class="w-full max-w-2xl">
-      <script async src="https://cse.google.com/cse.js?cx=00c43c37b85874aa1"></script>
-      <div class="gcse-search"></div>
-    </div>
-  </div>
+        function initTime() {
+            const update = () => {
+                const now = new Date();
+                const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                document.getElementById('system-time').innerText = time;
+                if(document.getElementById('home-clock')) document.getElementById('home-clock').innerText = time;
+                if(document.getElementById('shade-time')) document.getElementById('shade-time').innerText = time;
+                const opts = { weekday: 'long', month: 'short', day: 'numeric' };
+                if(document.getElementById('home-date')) document.getElementById('home-date').innerText = now.toLocaleDateString('en-US', opts);
+            };
+            setInterval(update, 1000);
+            update();
+        }
 
-  <script>
-    const jokes = [
-      "What do you call an elf who sings? A wrapper!",
-      "Why did the Christmas tree go to the dentist? Because it needed a root canal!",
-      "What do you get if you cross Santa with a detective? Santa Clues!",
-      "What kind of motor vehicle does Santa drive? A 'Ho Ho Ho-nda'!",
-      "What is a Christmas ornament's favorite song? 'O Tannen-bomb'!",
-      "What is Santa's favorite snack food? Crisp Pringles!",
-      "What do you call a reindeer with no eyes? I have no eye-deer!",
-    ];
+        function toggleShade() {
+            if(!setupCompleted) return;
+            isShadeOpen = !isShadeOpen;
+            document.getElementById('notification-shade').style.top = isShadeOpen ? '0' : '-100%';
+        }
 
-    function updateCountdown() {
-      const now = new Date();
-      const christmas = new Date(now.getFullYear(), 11, 25);
+        function openApp(id) {
+            if(id !== 'calculator') {
+                document.querySelectorAll('.app-window').forEach(w => w.style.display = 'none');
+            }
+            const target = document.getElementById(`app-${id}`);
+            if(target) target.style.display = 'flex';
+            if(isShadeOpen) toggleShade();
+        }
 
-      if (now.getMonth() === 11 && now.getDate() > 25) {
-        christmas.setFullYear(christmas.getFullYear() + 1);
-      }
+        function closeApp() {
+            document.querySelectorAll('.app-window').forEach(w => w.style.display = 'none');
+        }
 
-      const diff = christmas - now;
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const countdownEl = document.getElementById('countdown');
+        function goBack() {
+            closeApp();
+        }
 
-      countdownEl.textContent =
-        days < 0 ? "🎄 Merry Christmas!" :
-        days === 0 ? "🎅 It's Christmas Day!" :
-        `${days} days until Christmas`;
-    }
+        function applyWall(url) {
+            document.getElementById('wallpaper-bg').style.backgroundImage = `url('${url}')`;
+            closeApp();
+        }
 
-    function displayJoke() {
-      const jokeEl = document.getElementById('joke');
-      const randomIndex = Math.floor(Math.random() * jokes.length);
-      jokeEl.textContent = `Joke of the Day: "${jokes[randomIndex]}"`;
-    }
-
-    function updateArtwork() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const time = now.toLocaleTimeString();
-      document.getElementById("artwork").textContent = `${year} • ${time}`;
-    }
-
-    function applySeasonalMode() {
-      const now = new Date();
-      const month = now.getMonth();
-
-      const christmasImg = document.getElementById("christmasImage");
-      const artwork = document.getElementById("artwork");
-      const countdown = document.getElementById("countdown");
-      const joke = document.getElementById("joke");
-      const subtitle = document.getElementById("subtitle");
-
-      if (month === 11) {
-        // 🎄 DECEMBER MODE
-        christmasImg.style.display = "block";
-        countdown.style.display = "block";
-        joke.style.display = "none"; // You asked to hide joke in December
-        artwork.style.display = "none";
-
-        document.body.style.background = "var(--christmas-bg)";
-        document.body.style.color = "var(--christmas-text)";
-        subtitle.textContent = "The festive search experience, powered by Rohan.";
-
-        updateCountdown();
-        setInterval(updateCountdown, 1000 * 60 * 60 * 24);
-
-      } else {
-        // 🌈 NON‑DECEMBER MODE
-        christmasImg.style.display = "none";
-        countdown.style.display = "none";
-        joke.style.display = "none";
-        artwork.style.display = "block";
-
-        document.body.style.background = "var(--fun-bg)";
-        document.body.style.color = "white";
-        subtitle.textContent = "A colourful search experience, powered by Rohan.";
-
-        updateArtwork();
-        setInterval(updateArtwork, 1000);
-      }
-    }
-
-    function forceLinksNewTab() {
-      document.querySelectorAll('.gs-webResult .gs-title a').forEach(link => {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-      });
-    }
-
-    function setupObserver() {
-      const target = document.querySelector('.gcse-search');
-      if (!target) {
-        setTimeout(setupObserver, 500);
-        return;
-      }
-      forceLinksNewTab();
-      const observer = new MutationObserver(() => forceLinksNewTab());
-      observer.observe(target, { childList: true, subtree: true });
-    }
-
-    window.onload = () => {
-      applySeasonalMode();
-      setupObserver();
-    };
-  </script>
-
+        function calc(cmd) {
+            const display = document.getElementById('calc-display');
+            const hist = document.getElementById('calc-hist');
+            if(cmd === 'AC') { currentCalc = ""; display.innerText = "0"; hist.innerText = ""; }
+            else if(cmd === 'DEL') { currentCalc = currentCalc.slice(0, -1); display.innerText = currentCalc || "0"; }
+            else if(cmd === '=') {
+                try {
+                    const result = eval(currentCalc);
+                    hist.innerText = currentCalc;
+                    display.innerText = result;
+                    currentCalc = result.toString();
+                } catch { display.innerText = "Error"; }
+            } else { currentCalc += cmd; display.innerText = currentCalc; }
+        }
+    </script>
 </body>
 </html>
